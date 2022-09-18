@@ -6,11 +6,11 @@ const validator=require("validator")
 
 const authorSchema = new mongoose.Schema({
     fname: {
-        type: String,
-        required: true,
+        type: String,   
+        required: true,  
         trim:true,
         validate(value){
-            if(!validator.isAlpha(value)) {
+            if(!validator.isAlpha(value)) {      
                 throw new Error("fname is invalid");
             }
         }
@@ -19,7 +19,7 @@ const authorSchema = new mongoose.Schema({
         type: String,
         required: true,
         trim:true,
-        validate(value){
+        validate(value){  
             if(!validator.isAlpha(value)) {
                 throw new Error("lname is invalid");
             }
@@ -30,7 +30,7 @@ const authorSchema = new mongoose.Schema({
         required: true,
         enum: ["Mr", "Mrs", "Miss"]
     },
-    email: {
+    email: {   
         type: String,
         unique: true,
         lowerCase: true,
@@ -44,8 +44,8 @@ const authorSchema = new mongoose.Schema({
     password: {
         type: String,
         required: true,
-        minlength:[8, "Password should be atlest 8 digits"]
-
+        minlength : [8,"atleast 8 digit password required"]
+        // pattern : /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,15}$/
     }
 }, { timestamps: true })
 

@@ -15,13 +15,13 @@ router.post('/login', authorController.authorLogin)
 
 router.post('/blogs',m1authentication.authentication, blogsController.createBlog)  // handeler function 
 
-router.get('/getBlogs',m1authentication.authentication, blogsController.getAllBlogs)
+router.get('/blogs',m1authentication.authentication, blogsController.getAllBlogs)
 
 router.put('/blogs/:blogId',m1authentication.authentication, m2Authorisation.authorization,blogsController.updatedBlogsData)
 
 router.delete('/blogs/:blogId',m1authentication.authentication,m2Authorisation.authorization, blogsController.deletedByParams)
 
-router.delete('/blog',m3Authorisation.authorization1,blogsController.deleteByQuery)
+router.delete('/blogs',m3Authorisation.authorization1,blogsController.deleteByQuery)
 
 
 module.exports = router;

@@ -1,4 +1,3 @@
-
 const blogsModel = require("../model/blogsmodel");
 let authorModel = require("../model/authormodel");
 
@@ -15,18 +14,18 @@ const createBlog = async function (req, res) {
       if (blogs.isPublished == true) {            
         blogs.publishedAt = Date.now();
         let savedData = await blogsModel.create(blogs);
-        res.status(201).send({ data: savedData });
+        res.status(201).send({  status:true ,data: savedData });
       } else if(blogs.isPublished==false){
         blogs.publishedAt=null;
         let savedData = await blogsModel.create(blogs);
-        res.status(201).send({ data: savedData });
+        res.status(201).send({ status:true ,data: savedData });
       }
 
     } else {
       res.status(400).send({ status: false, msg: "authorId is not present" });
     }
   } catch (err) {
-    res.status(500).send({ msg: "error", error: err.message })
+    res.status(500).send({ status:false,error: err.message })
   }
 }
 
@@ -42,9 +41,9 @@ const getAllBlogs = async (req, res) => {
       .find({ $and: [{ isDeleted: false }, { isPublished: true }, blogData] })
       .populate("authorId");
     if (!allBlogs) {
-      return res.status(400).send({ msg: "not valid" });
+      return res.status(400).send({ status:false,msg: "not valid" });
     }
-    res.status(200).send({ status: true, msg: allBlogs });
+    res.status(200).send({ status: true,msg:"Succesfull",data: allBlogs });
   } catch (err) {
     res.status(500).send({ staus: false, error: err.message });
   }
@@ -58,6 +57,11 @@ const updatedBlogsData = async function (req, res) {
   try{
   let getId = req.params.blogId;
   let data = req.body;
+  
+  if (Object.keys(data).length == 0) {
+    return res.status(400).send({ status: false, msg: "Data must be given" })
+  }
+
   let checkId = await blogsModel.findOne({ _id: getId });
   if (checkId) {
     if (checkId.isDeleted === false) {
@@ -72,15 +76,15 @@ const updatedBlogsData = async function (req, res) {
         },
         { new: true }
       );
-      res.status(200).send({ status: true, data: checkData });
+      res.status(200).send({ status: true,message:"The code is succesfully update",data: checkData });
     } else {
-      res.status(404).send("File is not present or Deleted");
+      res.status(404).send({status:false,message:"File is not present or Deleted"});
     }
   } else {
     res.status(404).send({ status: false, msg: "please enter valid blog id" });
   }
    }catch(error){
-    res.status(400).send({status:false,error:error.message})
+    res.status(500).send({status:false,error:error.message})
   }
 }
 
@@ -104,15 +108,14 @@ const deletedByParams = async function (req, res) {
         { $set: { isDeleted: true, deletedAt: Date.now() } },
         { new: true }
       );
-      res.status(200).send({ staus: true });
+      res.status(200).send({ staus: true ,message: "The file is deleted successfully"});
     } else {
-      res.status(404).send({ msg: "file is already deleted" });
+      res.status(404).send({status:false,message: "file is already deleted" });
     }
-  } catch (err) {
-    console.log(err.message);
-    res.status(500).send(err.message);
+  } catch (error) {
+    res.status(500).send({status:false,msg:"Not exist",error:error.message})
   }
-};
+}
 
 
 //=========================================== Delete By query ========================================================//
@@ -122,13 +125,16 @@ const deletedByParams = async function (req, res) {
  const deleteByQuery = async (req, res) => {
    try {
      let data = req.query;
+    //  query.authorId = decodedToken.userId;
+     let vaeriable = req.query.authorId
+
      let allBlogs = await blogsModel.find(data);
     if (allBlogs.length == 0) {
       return res.status(400).send({ status: false, msg: "No blog found" });
     }
       
        let deletedData = await blogsModel.updateMany(
-         { isDeleted: false },
+         { $and : [{authorId: vaeriable},{isDeleted:false},data] },
          { $set: { isDeleted: true, deletedAt: Date.now() } },
          { new: true }
       );
